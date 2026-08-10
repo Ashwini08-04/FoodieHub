@@ -5,5 +5,25 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #fffaf7;
+  color: #1e1b1a;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button {
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+::selection {
+  background: #ff6b35;
+  color: white;
 }

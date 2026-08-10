@@ -22,7 +22,21 @@ function CartProvider({ children }) {
     <CartContext.Provider
       value={{
         cart,
-        setCart
+        setCart,
+        cartCount: cart.reduce((total, item) => total + item.quantity, 0),
+        addItem: (item) => {
+          setCart((currentCart) => {
+            const existingItem = currentCart.find((cartItem) => cartItem.food === item.food)
+            if (existingItem) {
+              return currentCart.map((cartItem) =>
+                cartItem.food === item.food
+                  ? { ...cartItem, quantity: cartItem.quantity + 1 }
+                  : cartItem
+              )
+            }
+            return [...currentCart, { ...item, quantity: 1 }]
+          })
+        },
       }}
     >
       {children}

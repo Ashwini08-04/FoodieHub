@@ -10,6 +10,7 @@ import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Checkout from "./pages/Checkout"
 import OrderSuccess from "./pages/OrderSuccess"
+import Dashboard from "./pages/Dashboard"
 
 
 
@@ -40,6 +41,8 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
 
         <Route path="/order-success" element={<OrderSuccess />} />
+
+         <Route path="/dashboard" element={<Dashboard />} />
 
 
       </Routes>

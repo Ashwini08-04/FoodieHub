@@ -11,6 +11,7 @@ import {
 
 import api from "../api/api"
 import FoodCard from "../components/FoodCard"
+import { demoFoods, demoRestaurants } from "../data/demoData"
 
 import "./RestaurantDetails.css"
 
@@ -30,18 +31,13 @@ function RestaurantDetails() {
         setError("")
 
         // Get restaurant details
-        const restaurantResponse = await api.get(
-          `/restaurants/${id}`
-        )
-
+        const restaurantResponse = await api.get(`/restaurants/${id}`)
+        if (!restaurantResponse.data || typeof restaurantResponse.data !== "object" || Array.isArray(restaurantResponse.data)) {
+          throw new Error("Restaurant API unavailable")
+        }
         setRestaurant(restaurantResponse.data)
-
-        // Get restaurant food
-        const foodResponse = await api.get(
-          `/foods/restaurant/${id}`
-        )
-
-        setFoods(foodResponse.data)
+        const foodResponse = await api.get(`/foods/restaurant/${id}`)
+        setFoods(Array.isArray(foodResponse.data) ? foodResponse.data : [])
 
       } catch (error) {
         console.error(
@@ -49,10 +45,14 @@ function RestaurantDetails() {
           error.response?.data || error.message
         )
 
-        setError(
-          error.response?.data?.message ||
-          "Failed to load restaurant"
-        )
+        const fallbackRestaurant = demoRestaurants.find((item) => item._id === id)
+        if (fallbackRestaurant) {
+          setRestaurant(fallbackRestaurant)
+          setFoods(demoFoods[id] || [])
+          setError("")
+        } else {
+          setError(error.response?.data?.message || "Failed to load restaurant")
+        }
       } finally {
         setLoading(false)
       }
@@ -65,7 +65,7 @@ function RestaurantDetails() {
   if (loading) {
     return (
       <div className="restaurant-details-page">
-        <p>Loading restaurant... 🍽️</p>
+        <p>Loading restaurant...</p>
       </div>
     )
   }
@@ -89,9 +89,7 @@ function RestaurantDetails() {
   if (!restaurant) {
     return (
       <div className="restaurant-details-page">
-        <p className="no-results">
-          Restaurant not found 😕
-        </p>
+        <p className="no-results">Restaurant not found.</p>
       </div>
     )
   }
@@ -150,7 +148,7 @@ function RestaurantDetails() {
       {/* Food Menu */}
       <section className="menu-section">
 
-        <h2>Popular Menu 🍽️</h2>
+        <h2>Popular menu</h2>
 
         {foods.length > 0 ? (
 
@@ -165,6 +163,9 @@ function RestaurantDetails() {
                 category={food.category}
                 price={food.price}
                 image={food.image}
+                description={food.description}
+                rating={food.rating}
+                bestseller={food.bestseller}
               />
 
             ))}

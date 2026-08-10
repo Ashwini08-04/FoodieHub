@@ -6,7 +6,8 @@ import {
   faUtensils,
   faCartShopping,
   faRightToBracket,
-  faUserPlus
+  faUserPlus,
+  faStore
 } from "@fortawesome/free-solid-svg-icons"
 import { CartContext } from "../context/CartContext"
 import "./Navbar.css"
@@ -49,6 +50,11 @@ function Navbar() {
               {cartCount}
             </span>
           )}
+        </NavLink>
+
+        <NavLink to="/dashboard" className="partner-link">
+          <FontAwesomeIcon icon={faStore} />
+          For partners
         </NavLink>
 
         <NavLink to="/login">

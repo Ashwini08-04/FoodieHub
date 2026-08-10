@@ -3,48 +3,24 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faStar,
   faClock,
-  faCartShopping
+  faCartShopping,
+  faLeaf
 } from "@fortawesome/free-solid-svg-icons"
 
 import { CartContext } from "../context/CartContext"
 import "./FoodCard.css"
 
-function FoodCard({ id, name, category, price, image }) {
-  const { cart, setCart } = useContext(CartContext)
+function FoodCard({ id, name, category, description, price, image, rating = 4.5, bestseller }) {
+  const { addItem } = useContext(CartContext)
 
   const addToCart = () => {
-    const existingItem = cart.find(item => item.food === id)
-
-    if (existingItem) {
-      setCart(
-        cart.map(item =>
-          item.food === id
-            ? {
-                ...item,
-                quantity: item.quantity + 1
-              }
-            : item
-        )
-      )
-    } else {
-      setCart([
-        ...cart,
-        {
-          food: id,
-          name,
-          category,
-          price,
-          image,
-          quantity: 1
-        }
-      ])
-    }
+    addItem({ food: id, name, category, price, image })
   }
 
   return (
     <div className="food-card">
 
-      {/* Food image */}
+      {bestseller && <span className="food-bestseller">Bestseller</span>}
       <div className="food-image">
         <img src={image} alt={name} />
       </div>
@@ -57,11 +33,12 @@ function FoodCard({ id, name, category, price, image }) {
 
           <span>
             <FontAwesomeIcon icon={faStar} />
-            4.5
+            {rating}
           </span>
         </div>
 
-        <p>{category}</p>
+        <p className="food-category"><FontAwesomeIcon icon={faLeaf} /> {category}</p>
+        {description && <p className="food-description">{description}</p>}
 
         <small>
           <FontAwesomeIcon icon={faClock} />
