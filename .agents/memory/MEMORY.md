@@ -1,0 +1,1 @@
+- [Vite preview hosts](vite-preview-hosts.md) — Replit’s proxied preview hostname can change, so Vite must accept dynamic preview hosts.
