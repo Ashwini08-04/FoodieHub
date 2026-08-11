@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap');
+
+:root {
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --color-background: #fcf6f3;
+  --color-surface: #ffffff;
+  --color-surface-strong: #f8f4f1;
+  --color-primary: #E23744;
+  --color-primary-dark: #b71c2c;
+  --color-secondary: #1C1C1C;
+  --color-muted: #7c6c66;
+  --color-muted-strong: #4e433f;
+  --color-success: #27ae60;
+  --color-veg: #27ae60;
+  --color-nonveg: #e23744;
+  --color-shadow-sm: 0 8px 22px rgba(28, 28, 28, 0.08);
+  --color-shadow-md: 0 18px 42px rgba(28, 28, 28, 0.12);
+  --color-shadow-lg: 0 24px 60px rgba(28, 28, 28, 0.16);
+  --radius-card: 18px;
+  --radius-pill: 999px;
+  --radius-sm: 12px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --shadow-sm: 0 12px 28px rgba(28, 28, 28, 0.08);
+  --shadow-md: 0 20px 45px rgba(28, 28, 28, 0.12);
+  --shadow-lg: 0 30px 75px rgba(28, 28, 28, 0.16);
+}
+
+body {
+  background: var(--color-background);
+  font-family: var(--font-body);
+  color: var(--color-secondary);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(226, 55, 68, 0.35);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

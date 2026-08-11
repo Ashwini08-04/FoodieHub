@@ -1,157 +1,86 @@
-const Order = require("../models/Order")
+const { Order, User } = require("../models");
 
-// Create order
+// Create new order
 const createOrder = async (req, res) => {
   try {
-    const {
-      items,
-      totalAmount,
-      address,
-      city,
-      phone
-    } = req.body
+    const { items, totalAmount, deliveryAddress } = req.body;
+
+    if (!items || items.length === 0) {
+      return res.status(400).json({ message: "No items provided" });
+    }
 
     const order = await Order.create({
-      user: req.user._id,
+      userId: req.user.id,
       items,
       totalAmount,
-      address,
-      city,
-      phone
-    })
+      deliveryAddress,
+      status: "placed"
+    });
 
-    res.status(201).json({
-      message: "Order placed successfully",
-      order
-    })
-
+    res.status(201).json({ message: "Order placed successfully", order });
   } catch (error) {
-    console.log("CREATE ORDER ERROR:", error)
-
-    res.status(500).json({
-      message: "Failed to place order",
-      error: error.message
-    })
+    res.status(500).json({ message: "Failed to create order", error: error.message });
   }
-}
+};
 
-
-// Get logged-in user's orders
-const getMyOrders = async (req, res) => {
+// Get user's orders
+const getUserOrders = async (req, res) => {
   try {
-    const userId =
-      req.user?.userId ||
-      req.user?._id ||
-      req.user?.id
+    const orders = await Order.findAll({
+      where: { userId: req.user.id },
+      order: [["createdAt", "DESC"]]
+    });
 
-    if (!userId) {
-      return res.status(401).json({
-        message: "User authentication failed"
-      })
-    }
-
-    const orders = await Order.find({
-      user: userId
-    }).populate("items.food")
-
-    res.status(200).json(orders)
-
+    res.status(200).json(orders);
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch orders",
-      error: error.message
-    })
+    res.status(500).json({ message: "Failed to fetch orders", error: error.message });
   }
-}
+};
 
-
-// Get single order
-const getOrderById = async (req, res) => {
+// Admin: Get all orders
+const getAllOrders = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id)
-      .populate("items.food")
-
-    if (!order) {
-      return res.status(404).json({
-        message: "Order not found"
-      })
-    }
-
-    res.status(200).json(order)
-
+    const orders = await Order.findAll({
+      include: [{ model: User, as: "user", attributes: ["name", "email"] }],
+      order: [["createdAt", "DESC"]]
+    });
+    res.status(200).json(orders);
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch order",
-      error: error.message
-    })
+    res.status(500).json({ message: "Failed to fetch all orders", error: error.message });
   }
-}
+};
 
-
-// Update order status
+// Update order status (Admin endpoint)
 const updateOrderStatus = async (req, res) => {
   try {
-    const { status } = req.body
+    const { status } = req.body;
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
+    const [updatedRows] = await Order.update(
       { status },
-      {
-        new: true,
-        runValidators: true
-      }
-    )
+      { where: { id: req.params.id } }
+    );
 
-    if (!order) {
-      return res.status(404).json({
-        message: "Order not found"
-      })
+    if (updatedRows === 0) {
+      return res.status(404).json({ message: "Order not found" });
     }
 
-    res.status(200).json({
-      message: "Order status updated",
-      order
-    })
+    const order = await Order.findByPk(req.params.id);
 
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to update order status",
-      error: error.message
-    })
-  }
-}
-
-
-// Delete order
-const deleteOrder = async (req, res) => {
-  try {
-    const order = await Order.findByIdAndDelete(
-      req.params.id
-    )
-
-    if (!order) {
-      return res.status(404).json({
-        message: "Order not found"
-      })
+    // Emit socket event for real-time tracking
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("orderStatusUpdate", { orderId: order.id, status: order.status });
     }
 
-    res.status(200).json({
-      message: "Order deleted successfully"
-    })
-
+    res.status(200).json({ message: "Order status updated", order });
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to delete order",
-      error: error.message
-    })
+    res.status(500).json({ message: "Failed to update order status", error: error.message });
   }
-}
-
+};
 
 module.exports = {
   createOrder,
-  getMyOrders,
-  getOrderById,
-  updateOrderStatus,
-  deleteOrder
-}
+  getUserOrders,
+  getAllOrders,
+  updateOrderStatus
+};

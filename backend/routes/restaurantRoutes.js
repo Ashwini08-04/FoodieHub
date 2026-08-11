@@ -8,7 +8,7 @@ const {
   deleteRestaurant,
 } = require("../controllers/restaurantController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+const { isAuth, isAdmin } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -17,9 +17,8 @@ router.get("/", getRestaurants);
 router.get("/:id", getRestaurantById);
 
 // Protected Routes
-router.post("/", authMiddleware, createRestaurant);
-router.put("/:id", authMiddleware, updateRestaurant);
-router.delete("/:id", authMiddleware, deleteRestaurant);
+router.post("/", isAuth, isAdmin, createRestaurant);
+router.put("/:id", isAuth, isAdmin, updateRestaurant);
+router.delete("/:id", isAuth, isAdmin, deleteRestaurant);
 
 module.exports = router;
-

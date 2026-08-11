@@ -1,52 +1,37 @@
-const mongoose = require("mongoose")
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const foodSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-
-    category: {
-      type: String,
-      required: true
-    },
-
-    description: {
-      type: String,
-      default: ""
-    },
-
-    price: {
-      type: Number,
-      required: true
-    },
-
-    image: {
-      type: String,
-      required: true
-    },
-
-    rating: {
-      type: Number,
-      default: 0
-    },
-
-    isAvailable: {
-      type: Boolean,
-      default: true
-    },
-
-    restaurant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Restaurant",
-      required: true
-    }
+const Food = sequelize.define("Food", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  {
-    timestamps: true
-  }
-)
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  price: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  image: {
+    type: DataTypes.STRING,
+  },
+  category: {
+    type: DataTypes.STRING,
+  },
+  description: {
+    type: DataTypes.TEXT,
+  },
+  isAvailable: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+  restaurantId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+});
 
-module.exports = mongoose.model("Food", foodSchema)
+module.exports = Food;

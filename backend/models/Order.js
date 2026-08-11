@@ -1,70 +1,31 @@
-const mongoose = require("mongoose")
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const orderSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true
-    },
-
-    items: [
-      {
-        food: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Food",
-          required: true
-        },
-
-        quantity: {
-          type: Number,
-          required: true,
-          min: 1
-        },
-
-        price: {
-          type: Number,
-          required: true
-        }
-      }
-    ],
-
-    totalAmount: {
-      type: Number,
-      required: true
-    },
-
-    address: {
-      type: String,
-      required: true
-    },
-
-    city: {
-      type: String,
-      required: true
-    },
-
-    phone: {
-      type: String,
-      required: true
-    },
-
-    status: {
-      type: String,
-      enum: [
-        "Pending",
-        "Confirmed",
-        "Preparing",
-        "Out for Delivery",
-        "Delivered",
-        "Cancelled"
-      ],
-      default: "Pending"
-    }
+const Order = sequelize.define("Order", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  {
-    timestamps: true
-  }
-)
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+  items: {
+    type: DataTypes.JSON, // Stores the array of items and quantities
+    allowNull: false,
+  },
+  totalAmount: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  status: {
+    type: DataTypes.ENUM("placed", "confirmed", "preparing", "out for delivery", "delivered"),
+    defaultValue: "placed",
+  },
+  deliveryAddress: {
+    type: DataTypes.TEXT,
+  },
+});
 
-module.exports = mongoose.model("Order", orderSchema)
+module.exports = Order;

@@ -45,7 +45,7 @@ function RestaurantDetails() {
           error.response?.data || error.message
         )
 
-        const fallbackRestaurant = demoRestaurants.find((item) => item._id === id)
+        const fallbackRestaurant = demoRestaurants.find((item) => item.id === id)
         if (fallbackRestaurant) {
           setRestaurant(fallbackRestaurant)
           setFoods(demoFoods[id] || [])
@@ -157,8 +157,8 @@ function RestaurantDetails() {
             {foods.map((food) => (
 
               <FoodCard
-                key={food._id}
-                id={food._id}
+                key={food.id}
+                id={food.id}
                 name={food.name}
                 category={food.category}
                 price={food.price}

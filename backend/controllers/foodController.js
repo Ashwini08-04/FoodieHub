@@ -1,168 +1,90 @@
-const Food = require("../models/Food");
+const { Food, Restaurant } = require("../models");
 
-// Get all food items
-const getFoods = async (req, res) => {
-  try {
-    const foods = await Food.find()
-      .populate("restaurant")
-      .sort({ createdAt: -1 });
-
-    res.status(200).json(foods);
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch food items",
-      error: error.message,
-    });
-  }
-};
-
-// Get single food item
-const getFoodById = async (req, res) => {
-  try {
-    const food = await Food.findById(req.params.id).populate("restaurant");
-
-    if (!food) {
-      return res.status(404).json({
-        message: "Food item not found",
-      });
-    }
-
-    res.status(200).json(food);
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch food item",
-      error: error.message,
-    });
-  }
-};
-
-// Get food by restaurant
+// Get foods by restaurant
 const getFoodsByRestaurant = async (req, res) => {
   try {
-    const foods = await Food.find({
-      restaurant: req.params.restaurantId,
-    }).sort({ createdAt: -1 });
+    const { restaurantId } = req.params;
+    
+    // Optional filter
+    const filter = { restaurantId };
+    if (req.query.category) {
+      filter.category = req.query.category;
+    }
+
+    const foods = await Food.findAll({
+      where: filter,
+      include: [{
+        model: Restaurant,
+        as: "restaurant",
+        attributes: ["name"]
+      }]
+    });
 
     res.status(200).json(foods);
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch restaurant food",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Failed to fetch menu items", error: error.message });
   }
 };
 
-// Create food
+// Create food item
 const createFood = async (req, res) => {
   try {
-    const {
-      name,
-      category,
-      description,
-      price,
-      image,
-      rating,
-      isAvailable,
-      restaurant,
-    } = req.body;
+    const { name, price, image, category, description, isAvailable } = req.body;
+    const { restaurantId } = req.params;
 
-    if (!name || !category || !price || !image || !restaurant) {
-      return res.status(400).json({
-        message: "Please fill all required fields",
-      });
-    }
-
-    const existingFood = await Food.findOne({
-      name,
-      restaurant,
-    });
-
-    if (existingFood) {
-      return res.status(400).json({
-        message: "Food item already exists",
-      });
+    const restaurant = await Restaurant.findByPk(restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
     }
 
     const food = await Food.create({
-      name,
-      category,
-      description,
-      price,
-      image,
-      rating,
-      isAvailable,
-      restaurant,
+      name, price, image, category, description, isAvailable, restaurantId
     });
 
-    res.status(201).json({
-      message: "Food item created successfully",
-      food,
-    });
+    res.status(201).json({ message: "Food item created successfully", food });
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to create food item",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Failed to create food item", error: error.message });
   }
 };
 
-// Update food
+// Update food item
 const updateFood = async (req, res) => {
   try {
-    const food = await Food.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const [updatedRows] = await Food.update(req.body, {
+      where: { id: req.params.id }
+    });
 
-    if (!food) {
-      return res.status(404).json({
-        message: "Food item not found",
-      });
+    if (updatedRows === 0) {
+      return res.status(404).json({ message: "Food item not found" });
     }
-
-    res.status(200).json({
-      message: "Food item updated successfully",
-      food,
-    });
+    
+    const food = await Food.findByPk(req.params.id);
+    res.status(200).json({ message: "Food item updated successfully", food });
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to update food item",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Failed to update food item", error: error.message });
   }
 };
 
-// Delete food
+// Delete food item
 const deleteFood = async (req, res) => {
   try {
-    const food = await Food.findByIdAndDelete(req.params.id);
+    const deleted = await Food.destroy({
+      where: { id: req.params.id }
+    });
 
-    if (!food) {
-      return res.status(404).json({
-        message: "Food item not found",
-      });
+    if (!deleted) {
+      return res.status(404).json({ message: "Food item not found" });
     }
 
-    res.status(200).json({
-      message: "Food item deleted successfully",
-    });
+    res.status(200).json({ message: "Food item deleted successfully" });
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to delete food item",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Failed to delete food item", error: error.message });
   }
 };
 
 module.exports = {
-  getFoods,
-  getFoodById,
   getFoodsByRestaurant,
   createFood,
   updateFood,
-  deleteFood,
+  deleteFood
 };

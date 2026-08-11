@@ -1,117 +1,79 @@
+const bcrypt = require("bcrypt");
+const { sequelize, User, Restaurant, Food } = require("./models");
 require("dotenv").config();
-const mongoose = require("mongoose");
 
-const connectDB = require("./config/db");
+const cuisines = ["North Indian", "South Indian", "Chinese", "Italian", "Fast Food", "Desserts", "Beverages", "Healthy", "Street Food", "Bakery"];
 
-const Restaurant = require("./models/Restaurant");
-const Food = require("./models/Food");
+const restaurantsData = Array.from({ length: 10 }).map((_, i) => ({
+  name: `Restaurant ${i + 1}`,
+  category: cuisines[i % cuisines.length],
+  image: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=500&q=60`,
+  rating: (Math.random() * 2 + 3).toFixed(1), // 3.0 to 5.0
+  deliveryTime: `${Math.floor(Math.random() * 30) + 15} min`,
+  distance: `${(Math.random() * 5 + 1).toFixed(1)} km`,
+  offer: `${Math.floor(Math.random() * 40) + 10}% OFF`,
+  address: `Street ${i + 1}, Food City`,
+  isOpen: true,
+}));
 
-const seedData = async () => {
+const foodDataTemplate = [
+  { name: "Paneer Butter Masala", category: "veg", price: 250 },
+  { name: "Chicken Tikka", category: "non-veg", price: 300 },
+  { name: "Margherita Pizza", category: "veg", price: 350 },
+  { name: "Pasta Alfredo", category: "veg", price: 280 },
+  { name: "Mutton Biryani", category: "non-veg", price: 400 },
+  { name: "Veg Hakka Noodles", category: "veg", price: 180 },
+  { name: "Chilli Chicken", category: "non-veg", price: 260 },
+  { name: "Masala Dosa", category: "veg", price: 120 },
+  { name: "Chocolate Brownie", category: "veg", price: 150 },
+  { name: "Cold Coffee", category: "veg", price: 100 }
+];
+
+async function seedDatabase() {
   try {
-    await connectDB();
+    console.log("Connecting to SQLite and syncing models (force: true)...");
+    await sequelize.sync({ force: true });
 
-    // Clear old data
-    await Restaurant.deleteMany();
-    await Food.deleteMany();
+    console.log("Creating users...");
+    const hashedPassword = await bcrypt.hash("password123", 10);
 
-    console.log("Old data deleted.");
+    const admin = await User.create({
+      name: "Admin User",
+      email: "admin@foodiehub.com",
+      password: hashedPassword,
+      role: "admin"
+    });
 
-    // Create Restaurants
-    const restaurants = await Restaurant.insertMany([
-      {
-        name: "Pizza House",
-        category: "Italian Food",
-        image: "/images/pizza-house.jpg",
-        rating: 4.6,
-        deliveryTime: "25-30 min",
-        distance: "1.8 km",
-        offer: "20% OFF"
-      },
-      {
-        name: "Burger Point",
-        category: "Fast Food",
-        image: "/images/burger-point.jpg",
-        rating: 4.4,
-        deliveryTime: "20-25 min",
-        distance: "2.3 km",
-        offer: "15% OFF"
-      },
-      {
-        name: "Food Corner",
-        category: "Indian Food",
-        image: "/images/food-corner.jpg",
-        rating: 4.7,
-        deliveryTime: "30-35 min",
-        distance: "1.5 km",
-        offer: "25% OFF"
-      }
-    ]);
+    const user = await User.create({
+      name: "Test User",
+      email: "user@foodiehub.com",
+      password: hashedPassword,
+      role: "user"
+    });
+    
+    console.log("Creating exactly 10 restaurants and exactly 100 food items...");
+    for (let i = 0; i < restaurantsData.length; i++) {
+      const restData = { ...restaurantsData[i], ownerId: admin.id };
+      const restaurant = await Restaurant.create(restData);
 
-    // Create Foods
-    await Food.insertMany([
-      {
-        name: "Cheese Pizza",
-        category: "Italian",
-        description: "Loaded with mozzarella cheese",
-        price: 299,
-        image: "/images/cheese-pizza.jpg",
-        rating: 4.8,
-        restaurant: restaurants[0]._id
-      },
-      {
-        name: "Veg Pizza",
-        category: "Italian",
-        description: "Fresh vegetable pizza",
-        price: 249,
-        image: "/images/veg-pizza.jpg",
-        rating: 4.5,
-        restaurant: restaurants[0]._id
-      },
-      {
-        name: "Veg Burger",
-        category: "Fast Food",
-        description: "Crispy veg burger",
-        price: 199,
-        image: "/images/veg-burger.jpg",
-        rating: 4.4,
-        restaurant: restaurants[1]._id
-      },
-      {
-        name: "French Fries",
-        category: "Snacks",
-        description: "Golden crispy fries",
-        price: 129,
-        image: "/images/fries.jpg",
-        rating: 4.3,
-        restaurant: restaurants[1]._id
-      },
-      {
-        name: "Paneer Tikka",
-        category: "Indian",
-        description: "Spicy paneer tikka",
-        price: 249,
-        image: "/images/paneer-tikka.jpg",
-        rating: 4.7,
-        restaurant: restaurants[2]._id
-      },
-      {
-        name: "Veg Thali",
-        category: "Indian",
-        description: "Traditional veg thali",
-        price: 199,
-        image: "/images/veg-thali.jpg",
-        rating: 4.6,
-        restaurant: restaurants[2]._id
-      }
-    ]);
+      const foodsToCreate = foodDataTemplate.map(f => ({
+        ...f,
+        description: `Delicious ${f.name} prepared with fresh ingredients.`,
+        image: `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=60`,
+        rating: (Math.random() * 2 + 3).toFixed(1),
+        isAvailable: true,
+        restaurantId: restaurant.id
+      }));
 
-    console.log("Database seeded successfully!");
+      await Food.bulkCreate(foodsToCreate);
+    }
 
-    process.exit();
+    console.log("SQLite Database seeded successfully!");
+    process.exit(0);
   } catch (error) {
-    console.log(error);
+    console.error("Error seeding SQLite database:", error);
     process.exit(1);
   }
-};
+}
 
-seedData();
+seedDatabase();

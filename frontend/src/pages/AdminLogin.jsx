@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/api";
 import "./Auth.css";
 
-function Login() {
+function AdminLogin() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -19,7 +19,6 @@ function Login() {
       ...form,
       [e.target.name]: e.target.value,
     });
-
     setError("");
   };
 
@@ -34,7 +33,7 @@ function Login() {
     try {
       setLoading(true);
 
-      const response = await api.post("/auth/login", {
+      const response = await api.post("/auth/admin/login", {
         email: form.email,
         password: form.password,
       });
@@ -43,20 +42,17 @@ function Login() {
       localStorage.setItem("token", response.data.token);
 
       // Save User Details
-      localStorage.setItem(
-        "user",
-        JSON.stringify(response.data.user)
-      );
+      localStorage.setItem("user", JSON.stringify(response.data.user));
 
       // Login Status
       localStorage.setItem("isLoggedIn", "true");
 
       alert(response.data.message);
 
-      navigate("/");
+      navigate("/admin");
     } catch (error) {
       setError(
-        error.response?.data?.message || "Login failed"
+        error.response?.data?.message || "Admin Login failed"
       );
     } finally {
       setLoading(false);
@@ -64,14 +60,14 @@ function Login() {
   };
 
   return (
-    <div className="auth">
-      <h1>Login 🔐</h1>
+    <div className="auth admin-auth">
+      <h1>Admin Login 👑</h1>
 
       <form onSubmit={handleSubmit}>
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Admin Email"
           value={form.email}
           onChange={handleChange}
         />
@@ -91,18 +87,18 @@ function Login() {
         )}
 
         <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Authenticating..." : "Login to Dashboard"}
         </button>
       </form>
 
       <p className="auth-link">
-        Don't have an account?{" "}
-        <Link to="/register">
-          Register
+        Not an admin?{" "}
+        <Link to="/login">
+          User Login
         </Link>
       </p>
     </div>
   );
 }
 
-export default Login;
+export default AdminLogin;

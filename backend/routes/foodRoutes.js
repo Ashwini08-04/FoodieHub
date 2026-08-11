@@ -9,22 +9,18 @@ const {
   deleteFood,
 } = require("../controllers/foodController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+const { isAuth, isAdmin } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // Public Routes
 router.get("/", getFoods);
-
 router.get("/restaurant/:restaurantId", getFoodsByRestaurant);
-
 router.get("/:id", getFoodById);
 
 // Protected Routes
-router.post("/", authMiddleware, createFood);
-
-router.put("/:id", authMiddleware, updateFood);
-
-router.delete("/:id", authMiddleware, deleteFood);
+router.post("/", isAuth, isAdmin, createFood);
+router.put("/:id", isAuth, isAdmin, updateFood);
+router.delete("/:id", isAuth, isAdmin, deleteFood);
 
 module.exports = router;

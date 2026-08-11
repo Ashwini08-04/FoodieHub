@@ -48,13 +48,13 @@ function Dashboard() {
   }
 
   const deleteFood = (id) => {
-    saveMenu(menu.filter((food) => food._id !== id))
+    saveMenu(menu.filter((food) => food.id !== id))
     setNotice("Menu item removed.")
     window.setTimeout(() => setNotice(""), 2500)
   }
 
   const toggleAvailability = (id) => {
-    saveMenu(menu.map((food) => food._id === id ? { ...food, isAvailable: !food.isAvailable } : food))
+    saveMenu(menu.map((food) => food.id === id ? { ...food, isAvailable: !food.isAvailable } : food))
   }
 
   const navItems = [
@@ -91,7 +91,7 @@ function Dashboard() {
         {activeView === "Settings" && <SettingsView />}
       </section>
 
-      {showMenuForm && <MenuForm food={editingFood} close={() => { setShowMenuForm(false); setEditingFood(null) }} save={(food) => { saveMenu(editingFood ? menu.map((item) => item._id === food._id ? food : item) : [...menu, { ...food, _id: `food-${Date.now()}` }]); setShowMenuForm(false); setEditingFood(null); setNotice(editingFood ? "Menu item updated." : "New menu item added."); window.setTimeout(() => setNotice(""), 2500) }} />}
+      {showMenuForm && <MenuForm food={editingFood} close={() => { setShowMenuForm(false); setEditingFood(null) }} save={(food) => { saveMenu(editingFood ? menu.map((item) => item.id === food.id ? food : item) : [...menu, { ...food, _id: `food-${Date.now()}` }]); setShowMenuForm(false); setEditingFood(null); setNotice(editingFood ? "Menu item updated." : "New menu item added."); window.setTimeout(() => setNotice(""), 2500) }} />}
     </main>
   )
 }
@@ -123,7 +123,7 @@ function OrderRow({ order, updateOrder }) {
 }
 
 function MenuView({ menu, setShowMenuForm, setEditingFood, deleteFood, toggleAvailability }) {
-  return <div className="dashboard-view"><div className="view-title-row"><div><span className="eyebrow">Your offerings</span><h2>Menu management</h2><p>Keep your menu fresh and up to date for hungry customers.</p></div><button className="primary-button" onClick={() => { setEditingFood(null); setShowMenuForm(true) }}><FontAwesomeIcon icon={faCirclePlus} /> Add item</button></div><div className="menu-management-card"><div className="menu-card-top"><strong>{menu.length} items</strong><span><FontAwesomeIcon icon={faCircle} /> Live on FoodieHub</span></div><div className="menu-management-list">{menu.map((food) => <div className="management-item" key={food._id}><img src={food.image} alt="" /><div className="management-info"><strong>{food.name}</strong><small>{food.category} · ₹{food.price}</small><p>{food.description}</p></div><button className={`availability ${food.isAvailable ? "available" : "unavailable"}`} onClick={() => toggleAvailability(food._id)}><FontAwesomeIcon icon={faCircle} /> {food.isAvailable ? "Available" : "Paused"}</button><button className="icon-button" onClick={() => { setEditingFood(food); setShowMenuForm(true) }}><FontAwesomeIcon icon={faPencil} /></button><button className="icon-button danger" onClick={() => deleteFood(food._id)}><FontAwesomeIcon icon={faTrash} /></button></div>)}</div></div></div>
+  return <div className="dashboard-view"><div className="view-title-row"><div><span className="eyebrow">Your offerings</span><h2>Menu management</h2><p>Keep your menu fresh and up to date for hungry customers.</p></div><button className="primary-button" onClick={() => { setEditingFood(null); setShowMenuForm(true) }}><FontAwesomeIcon icon={faCirclePlus} /> Add item</button></div><div className="menu-management-card"><div className="menu-card-top"><strong>{menu.length} items</strong><span><FontAwesomeIcon icon={faCircle} /> Live on FoodieHub</span></div><div className="menu-management-list">{menu.map((food) => <div className="management-item" key={food.id}><img src={food.image} alt="" /><div className="management-info"><strong>{food.name}</strong><small>{food.category} · ₹{food.price}</small><p>{food.description}</p></div><button className={`availability ${food.isAvailable ? "available" : "unavailable"}`} onClick={() => toggleAvailability(food.id)}><FontAwesomeIcon icon={faCircle} /> {food.isAvailable ? "Available" : "Paused"}</button><button className="icon-button" onClick={() => { setEditingFood(food); setShowMenuForm(true) }}><FontAwesomeIcon icon={faPencil} /></button><button className="icon-button danger" onClick={() => deleteFood(food.id)}><FontAwesomeIcon icon={faTrash} /></button></div>)}</div></div></div>
 }
 
 function OrdersView({ orders, updateOrder }) {

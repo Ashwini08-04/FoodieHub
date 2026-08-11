@@ -5,21 +5,22 @@ const {
   getMyOrders,
   getOrderById,
   updateOrderStatus,
-  deleteOrder
+  deleteOrder,
+  getAllOrders
 } = require("../controllers/orderController")
 
-const authMiddleware = require("../middleware/authMiddleware")
+const { isAuth, isAdmin } = require("../middleware/authMiddleware")
 
 const router = express.Router()
 
-router.post("/", authMiddleware, createOrder)
+// User Routes
+router.post("/", isAuth, createOrder)
+router.get("/my-orders", isAuth, getMyOrders)
+router.get("/:id", isAuth, getOrderById)
 
-router.get("/my-orders", authMiddleware, getMyOrders)
-
-router.get("/:id", authMiddleware, getOrderById)
-
-router.put("/:id/status", authMiddleware, updateOrderStatus)
-
-router.delete("/:id", authMiddleware, deleteOrder)
+// Admin Routes
+router.get("/admin/all", isAuth, isAdmin, getAllOrders)
+router.put("/:id/status", isAuth, isAdmin, updateOrderStatus)
+router.delete("/:id", isAuth, isAdmin, deleteOrder)
 
 module.exports = router

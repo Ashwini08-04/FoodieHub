@@ -1,13 +1,21 @@
+@import "./styles/theme.css";
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #fffaf7;
-  color: #1e1b1a;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-secondary);
+  font-family: var(--font-body);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -24,6 +32,24 @@ button:active {
 }
 
 ::selection {
-  background: #ff6b35;
+  background: var(--color-primary);
   color: white;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }

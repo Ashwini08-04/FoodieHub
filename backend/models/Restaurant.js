@@ -1,43 +1,46 @@
-const mongoose = require("mongoose")
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const restaurantSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-      trim: true
-    },
-
-    category: {
-      type: String,
-      required: true
-    },
-
-    image: {
-      type: String,
-      required: true
-    },
-
-    rating: {
-      type: Number,
-      default: 0
-    },
-
-    deliveryTime: {
-      type: String
-    },
-
-    distance: {
-      type: String
-    },
-
-    offer: {
-      type: String
-    }
+const Restaurant = sequelize.define("Restaurant", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  {
-    timestamps: true
-  }
-)
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  category: {
+    type: DataTypes.STRING,
+  },
+  image: {
+    type: DataTypes.STRING,
+  },
+  rating: {
+    type: DataTypes.FLOAT,
+    defaultValue: 0,
+  },
+  deliveryTime: {
+    type: DataTypes.STRING,
+  },
+  distance: {
+    type: DataTypes.STRING,
+  },
+  offer: {
+    type: DataTypes.STRING,
+  },
+  address: {
+    type: DataTypes.STRING,
+  },
+  isOpen: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+  ownerId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+  },
+});
 
-module.exports = mongoose.model("Restaurant", restaurantSchema)
+module.exports = Restaurant;
