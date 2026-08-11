@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faReceipt, faUser, faMapPin, faClock, faTruck, faShieldCheck } from "@fortawesome/free-solid-svg-icons"
+import { faReceipt, faUser, faMapPin, faClock, faTruck } from "@fortawesome/free-solid-svg-icons"
 import { io } from "socket.io-client"
 import api from "../api/api"
 import "./UserDashboard.css"
