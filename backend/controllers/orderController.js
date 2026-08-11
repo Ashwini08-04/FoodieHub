@@ -37,6 +37,37 @@ const getUserOrders = async (req, res) => {
   }
 };
 
+// Alias expected by routes
+const getMyOrders = getUserOrders;
+
+// Get single order by id
+const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // Allow access if admin or owner
+    if (req.user.role !== 'admin' && order.userId !== req.user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch order", error: error.message });
+  }
+};
+
+// Delete order (admin)
+const deleteOrder = async (req, res) => {
+  try {
+    const deleted = await Order.destroy({ where: { id: req.params.id } });
+    if (!deleted) return res.status(404).json({ message: "Order not found" });
+    res.status(200).json({ message: "Order deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete order", error: error.message });
+  }
+};
+
 // Admin: Get all orders
 const getAllOrders = async (req, res) => {
   try {
@@ -81,6 +112,9 @@ const updateOrderStatus = async (req, res) => {
 module.exports = {
   createOrder,
   getUserOrders,
+  getMyOrders,
+  getOrderById,
   getAllOrders,
-  updateOrderStatus
+  updateOrderStatus,
+  deleteOrder
 };

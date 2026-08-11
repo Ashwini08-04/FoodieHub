@@ -1,5 +1,30 @@
 const { Food, Restaurant } = require("../models");
 
+// Get all foods (public)
+const getFoods = async (req, res) => {
+  try {
+    const foods = await Food.findAll({
+      include: [{ model: Restaurant, as: "restaurant", attributes: ["name"] }]
+    });
+    res.status(200).json(foods);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch foods", error: error.message });
+  }
+};
+
+// Get single food by id
+const getFoodById = async (req, res) => {
+  try {
+    const food = await Food.findByPk(req.params.id, {
+      include: [{ model: Restaurant, as: "restaurant", attributes: ["name"] }]
+    });
+    if (!food) return res.status(404).json({ message: "Food item not found" });
+    res.status(200).json(food);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch food", error: error.message });
+  }
+};
+
 // Get foods by restaurant
 const getFoodsByRestaurant = async (req, res) => {
   try {
@@ -83,6 +108,8 @@ const deleteFood = async (req, res) => {
 };
 
 module.exports = {
+  getFoods,
+  getFoodById,
   getFoodsByRestaurant,
   createFood,
   updateFood,
