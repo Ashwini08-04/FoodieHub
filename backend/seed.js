@@ -3,12 +3,36 @@ const { sequelize, User, Restaurant, Food } = require("./models");
 require("dotenv").config();
 
 const cuisines = ["North Indian", "South Indian", "Chinese", "Italian", "Fast Food", "Desserts", "Beverages", "Healthy", "Street Food", "Bakery"];
+const restaurantNames = [
+  "Saffron Spoon",
+  "Bella Pizza House",
+  "Burger Barn",
+  "Thali Corner",
+  "Green Bowl",
+  "Flame Grill",
+  "Ocean Catch",
+  "Sugar Rush",
+  "Urban Eats",
+  "Spice Route",
+];
+const restaurantImages = [
+  "/images/indian.jpg",
+  "/images/pizza-house.jpg",
+  "/images/burger-point.jpg",
+  "/images/food-corner.jpg",
+  "/images/veg-burger.jpg",
+  "/images/classic-burger.jpg",
+  "/images/cheese-pizza.jpg",
+  "/images/veg-thali.jpg",
+  "/images/pizza.jpg",
+  "/images/masala-dosa.jpg",
+];
 
-const restaurantsData = Array.from({ length: 10 }).map((_, i) => ({
-  name: `Restaurant ${i + 1}`,
+const restaurantsData = restaurantNames.map((name, i) => ({
+  name,
   category: cuisines[i % cuisines.length],
-  image: `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=500&q=60`,
-  rating: (Math.random() * 2 + 3).toFixed(1), // 3.0 to 5.0
+  image: restaurantImages[i],
+  rating: (Math.random() * 2 + 3).toFixed(1),
   deliveryTime: `${Math.floor(Math.random() * 30) + 15} min`,
   distance: `${(Math.random() * 5 + 1).toFixed(1)} km`,
   offer: `${Math.floor(Math.random() * 40) + 10}% OFF`,
@@ -17,16 +41,16 @@ const restaurantsData = Array.from({ length: 10 }).map((_, i) => ({
 }));
 
 const foodDataTemplate = [
-  { name: "Paneer Butter Masala", category: "veg", price: 250 },
-  { name: "Chicken Tikka", category: "non-veg", price: 300 },
-  { name: "Margherita Pizza", category: "veg", price: 350 },
-  { name: "Pasta Alfredo", category: "veg", price: 280 },
-  { name: "Mutton Biryani", category: "non-veg", price: 400 },
-  { name: "Veg Hakka Noodles", category: "veg", price: 180 },
-  { name: "Chilli Chicken", category: "non-veg", price: 260 },
-  { name: "Masala Dosa", category: "veg", price: 120 },
-  { name: "Chocolate Brownie", category: "veg", price: 150 },
-  { name: "Cold Coffee", category: "veg", price: 100 }
+  { name: "Paneer Butter Masala", category: "veg", price: 250, image: "/images/paneer-masala.jpg" },
+  { name: "Chicken Tikka", category: "non-veg", price: 300, image: "/images/chicken-burger.jpg" },
+  { name: "Margherita Pizza", category: "veg", price: 350, image: "/images/cheese-pizza.jpg" },
+  { name: "Pasta Alfredo", category: "veg", price: 280, image: "/images/pizza.jpg" },
+  { name: "Mutton Biryani", category: "non-veg", price: 400, image: "/images/biryani.jpg" },
+  { name: "Veg Hakka Noodles", category: "veg", price: 180, image: "/images/masala-dosa.jpg" },
+  { name: "Chilli Chicken", category: "non-veg", price: 260, image: "/images/chicken-burger.jpg" },
+  { name: "Masala Dosa", category: "veg", price: 120, image: "/images/masala-dosa.jpg" },
+  { name: "Chocolate Brownie", category: "veg", price: 150, image: "/images/pizza-house.jpg" },
+  { name: "Cold Coffee", category: "veg", price: 100, image: "/images/fries.jpg" }
 ];
 
 async function seedDatabase() {

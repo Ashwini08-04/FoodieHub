@@ -6,7 +6,8 @@ const { Server } = require("socket.io");
 
 dotenv.config();
 
-const connectDB = require("./config/db");
+// Removed unused MongoDB connection (this project uses SQLite + Sequelize)
+// const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const restaurantRoutes = require("./routes/restaurantRoutes");

@@ -12,6 +12,16 @@ const getRestaurants = async (req, res) => {
   }
 };
 
+// Get restaurants for the logged in owner
+const getOwnerRestaurants = async (req, res) => {
+  try {
+    const restaurants = await Restaurant.findAll({ where: { ownerId: req.user.id } });
+    res.status(200).json(restaurants);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch restaurants", error: error.message });
+  }
+};
+
 // Get single restaurant
 const getRestaurantById = async (req, res) => {
   try {
@@ -82,6 +92,7 @@ const deleteRestaurant = async (req, res) => {
 
 module.exports = {
   getRestaurants,
+  getOwnerRestaurants,
   getRestaurantById,
   createRestaurant,
   updateRestaurant,

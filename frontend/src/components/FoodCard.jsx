@@ -22,7 +22,14 @@ function FoodCard({ id, name, category, description, price, image, rating = 4.5,
 
       {bestseller && <span className="food-bestseller">Bestseller</span>}
       <div className="food-image">
-        <img src={image} alt={name} />
+        <img
+          src={image || "/images/cheese-pizza.jpg"}
+          alt={name}
+          onError={(event) => {
+            event.currentTarget.onerror = null
+            event.currentTarget.src = "/images/cheese-pizza.jpg"
+          }}
+        />
       </div>
 
       {/* Food information */}

@@ -7,6 +7,7 @@ const {
   updateOrderStatus,
   deleteOrder,
   getAllOrders,
+  getPartnerOrders,
 } = require("../controllers/orderController");
 
 const { isAuth, isAdmin } = require("../middleware/authMiddleware");
@@ -16,6 +17,7 @@ const router = express.Router();
 // User Routes
 router.post("/", isAuth, createOrder);
 router.get("/my-orders", isAuth, getMyOrders);
+router.get("/partner", isAuth, getPartnerOrders);
 router.get("/:id", isAuth, getOrderById);
 
 // Admin Routes

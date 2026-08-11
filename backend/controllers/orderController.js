@@ -1,4 +1,4 @@
-const { Order, User } = require("../models");
+const { Order, User, Restaurant } = require("../models");
 
 // Create new order
 const createOrder = async (req, res) => {
@@ -9,9 +9,14 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: "No items provided" });
     }
 
+    const orderItems = items.map((item) => ({
+      ...item,
+      restaurantId: item.restaurantId || item.restaurant?._id || item.restaurant?.id || null,
+    }));
+
     const order = await Order.create({
       userId: req.user.id,
-      items,
+      items: orderItems,
       totalAmount,
       deliveryAddress,
       status: "placed"
@@ -69,6 +74,39 @@ const deleteOrder = async (req, res) => {
 };
 
 // Admin: Get all orders
+const getPartnerOrders = async (req, res) => {
+  try {
+    const restaurants = await Restaurant.findAll({ where: { ownerId: req.user.id }, attributes: ["id", "name"] });
+    const restaurantIds = restaurants.map((restaurant) => restaurant.id);
+
+    if (restaurantIds.length === 0) {
+      return res.status(200).json({ orders: [], analytics: { revenue: 0, orders: 0, activeOrders: 0 } });
+    }
+
+    const orders = await Order.findAll({ order: [["createdAt", "DESC"]] });
+    const partnerOrders = orders.filter((order) =>
+      order.items.some((item) => restaurantIds.includes(item.restaurantId))
+    );
+
+    const analytics = partnerOrders.reduce(
+      (acc, order) => {
+        const relevantItems = order.items.filter((item) => restaurantIds.includes(item.restaurantId));
+        acc.revenue += relevantItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        acc.orders += 1;
+        if (["placed", "confirmed", "preparing", "out for delivery"].includes(order.status)) {
+          acc.activeOrders += 1;
+        }
+        return acc;
+      },
+      { revenue: 0, orders: 0, activeOrders: 0 }
+    );
+
+    res.status(200).json({ orders: partnerOrders, analytics, restaurants });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch partner orders", error: error.message });
+  }
+};
+
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({
@@ -114,6 +152,7 @@ module.exports = {
   getUserOrders,
   getMyOrders,
   getOrderById,
+  getPartnerOrders,
   getAllOrders,
   updateOrderStatus,
   deleteOrder

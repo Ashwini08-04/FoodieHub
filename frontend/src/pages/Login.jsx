@@ -53,7 +53,7 @@ function Login() {
 
       alert(response.data.message);
 
-      navigate("/");
+      navigate(response.data.user.role === 'partner' ? "/dashboard" : "/");
     } catch (error) {
       setError(
         error.response?.data?.message || "Login failed"

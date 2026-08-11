@@ -10,24 +10,29 @@ const SOCKET_URL = "http://localhost:5000"
 const ORDER_STAGES = ["Placed", "Confirmed", "Preparing", "Out for Delivery", "Delivered"]
 
 function UserDashboard() {
-  const [activeTab, setActiveTab] = useState("Orders")
+    const user = JSON.parse(localStorage.getItem('user') || 'null')
+  const [activeTab, setActiveTab] = useState(user?.role === 'partner' ? "Restaurants" : "Orders")
   const [orders, setOrders] = useState([])
   const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchMyOrders()
+    if (user?.role !== 'partner') {
+      fetchMyOrders()
 
-    const socket = io(SOCKET_URL)
-    socket.on("orderStatusUpdate", (data) => {
-      setOrders((current) =>
-        current.map((order) =>
-          order.id === data.orderId ? { ...order, status: data.status } : order
+      const socket = io(SOCKET_URL)
+      socket.on("orderStatusUpdate", (data) => {
+        setOrders((current) =>
+          current.map((order) =>
+            order.id === data.orderId ? { ...order, status: data.status } : order
+          )
         )
-      )
-    })
+      })
 
-    return () => socket.disconnect()
+      return () => {
+        try { socket.disconnect() } catch (e) {}
+      }
+    }
   }, [])
 
   const fetchMyOrders = async () => {
@@ -49,6 +54,119 @@ function UserDashboard() {
   )
 
   const orderProgressIndex = (status) => Math.max(0, ORDER_STAGES.indexOf(status))
+
+  // Partner-specific state
+  const [myRestaurants, setMyRestaurants] = useState([])
+  const [loadingRestaurants, setLoadingRestaurants] = useState(false)
+  const [newDish, setNewDish] = useState({ name: '', price: '', image: '', category: '', restaurantId: '' })
+
+  useEffect(() => {
+    if (user?.role === 'partner') {
+      loadRestaurants()
+    }
+  }, [user])
+
+  const loadRestaurants = async () => {
+    setLoadingRestaurants(true)
+    try {
+      const res = await api.get('/restaurants/owner')
+      const owned = res.data || []
+      setMyRestaurants(owned)
+      if (owned[0]) setNewDish(d => ({ ...d, restaurantId: owned[0].id }))
+    } catch (e) {
+      console.error('Load restaurants failed', e)
+      setMyRestaurants([])
+    } finally {
+      setLoadingRestaurants(false)
+    }
+  }
+
+  const handleAddDish = async () => {
+    if (!newDish.name || !newDish.price || !newDish.restaurantId) return alert('Please fill dish name, price and select restaurant')
+    try {
+      const payload = { ...newDish, price: parseFloat(newDish.price) }
+      const res = await api.post('/foods', payload)
+      alert(res.data.message || 'Dish added')
+      setNewDish({ name: '', price: '', image: '', category: '', restaurantId: myRestaurants[0]?.id || '' })
+    } catch (e) {
+      alert(e.response?.data?.message || 'Failed to add dish')
+    }
+  }
+
+  if (user?.role === 'partner') {
+    return (
+      <main className="user-dashboard-page">
+        <section className="dashboard-hero">
+          <div className="hero-copy">
+            <span className="eyebrow">Partner dashboard</span>
+            <h1>Manage your restaurant and menu</h1>
+            <p>Create dishes, update menus, and view orders for your restaurant.</p>
+          </div>
+        </section>
+
+        <section className="dashboard-shell">
+          <aside className="dashboard-sidebar">
+            <div className="dashboard-brand">
+              <div className="brand-icon">FH</div>
+              <div>
+                <strong>FoodieHub</strong>
+                <small>Partner tools</small>
+              </div>
+            </div>
+            <nav className="dashboard-nav">
+              <button className={activeTab === "Restaurants" ? "active" : ""} onClick={() => setActiveTab("Restaurants")}>Restaurants</button>
+              <button className={activeTab === "Menu" ? "active" : ""} onClick={() => setActiveTab("Menu")}>Menu</button>
+              <button className={activeTab === "Profile" ? "active" : ""} onClick={() => setActiveTab("Profile")}>Profile</button>
+            </nav>
+          </aside>
+
+          <section className="dashboard-content">
+            {activeTab === 'Restaurants' && (
+              <div>
+                <h3>Your restaurants</h3>
+                {loadingRestaurants ? <p>Loading…</p> : (
+                  myRestaurants.length === 0 ? <p>No restaurants yet. Create one from registration or contact admin.</p> : (
+                    <ul>
+                      {myRestaurants.map(r => (
+                        <li key={r.id}><strong>{r.name}</strong> — {r.address || r.category}</li>
+                      ))}
+                    </ul>
+                  )
+                )}
+              </div>
+            )}
+
+            {activeTab === 'Menu' && (
+              <div>
+                <h3>Add a new dish</h3>
+                {myRestaurants.length === 0 && <p>You need a restaurant to add dishes.</p>}
+                <div style={{ display: 'flex', gap: 8, flexDirection: 'column', maxWidth: 600 }}>
+                  <select value={newDish.restaurantId} onChange={(e)=> setNewDish(d=>({...d, restaurantId: e.target.value}))}>
+                    {myRestaurants.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                  </select>
+                  <input placeholder="Dish name" value={newDish.name} onChange={(e)=> setNewDish(d=>({...d, name: e.target.value}))} />
+                  <input placeholder="Price" value={newDish.price} onChange={(e)=> setNewDish(d=>({...d, price: e.target.value}))} />
+                  <input placeholder="Image URL" value={newDish.image} onChange={(e)=> setNewDish(d=>({...d, image: e.target.value}))} />
+                  <input placeholder="Category" value={newDish.category} onChange={(e)=> setNewDish(d=>({...d, category: e.target.value}))} />
+                  <div>
+                    <button onClick={handleAddDish}>Add Dish</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'Profile' && (
+              <div>
+                <h3>Partner profile</h3>
+                <p>Name: {user.name}</p>
+                <p>Email: {user.email}</p>
+              </div>
+            )}
+          </section>
+        </section>
+      </main>
+    )
+  }
 
   return (
     <main className="user-dashboard-page">

@@ -45,10 +45,10 @@ function RestaurantDetails() {
           error.response?.data || error.message
         )
 
-        const fallbackRestaurant = demoRestaurants.find((item) => item.id === id)
+        const fallbackRestaurant = demoRestaurants.find((item) => item.id === id || item._id === id)
         if (fallbackRestaurant) {
           setRestaurant(fallbackRestaurant)
-          setFoods(demoFoods[id] || [])
+          setFoods(demoFoods[id] || demoFoods[fallbackRestaurant.id] || demoFoods[fallbackRestaurant._id] || [])
           setError("")
         } else {
           setError(error.response?.data?.message || "Failed to load restaurant")
@@ -157,8 +157,8 @@ function RestaurantDetails() {
             {foods.map((food) => (
 
               <FoodCard
-                key={food.id}
-                id={food.id}
+                key={food.id || food._id}
+                id={food.id || food._id}
                 name={food.name}
                 category={food.category}
                 price={food.price}

@@ -19,8 +19,8 @@ router.get("/restaurant/:restaurantId", getFoodsByRestaurant);
 router.get("/:id", getFoodById);
 
 // Protected Routes
-router.post("/", isAuth, isAdmin, createFood);
-router.put("/:id", isAuth, isAdmin, updateFood);
-router.delete("/:id", isAuth, isAdmin, deleteFood);
+router.post("/", isAuth, createFood);
+router.put("/:id", isAuth, updateFood);
+router.delete("/:id", isAuth, deleteFood);
 
 module.exports = router;

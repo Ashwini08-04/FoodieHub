@@ -19,15 +19,18 @@ import {
 import { CartContext } from "../context/CartContext"
 import "./Navbar.css"
 
-const tabs = [
-  { label: "Home", to: "/", icon: faHome },
-  { label: "Search", to: "/restaurant", icon: faMagnifyingGlass },
-  { label: "Orders", to: "/dashboard", icon: faClipboardList },
-  { label: "Cart", to: "/cart", icon: faCartShopping },
-  { label: "Profile", to: "/profile", icon: faUser }
-]
-
 function Navbar() {
+  const user = JSON.parse(localStorage.getItem("user") || "null")
+  const tabs = [
+    { label: "Home", to: "/", icon: faHome },
+    { label: "Search", to: "/restaurant", icon: faMagnifyingGlass },
+    { label: "Cart", to: "/cart", icon: faCartShopping },
+    { label: "Profile", to: "/profile", icon: faUser }
+  ]
+
+  if (user?.role === "partner") {
+    tabs.splice(2, 0, { label: "Dashboard", to: "/dashboard", icon: faClipboardList })
+  }
   const { cart, cartCount } = useContext(CartContext)
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -107,10 +110,25 @@ function Navbar() {
             </button>
             {profileOpen && (
               <div className="profile-dropdown">
-                <NavLink to="/login">Login</NavLink>
-                <NavLink to="/dashboard">Dashboard</NavLink>
-                <NavLink to="/register">Register</NavLink>
-                <button type="button">Logout</button>
+                {localStorage.getItem("token") ? (
+                  <>
+                    <NavLink to="/profile">Profile</NavLink>
+                    {user?.role === "partner" && (
+                      <NavLink to="/dashboard">Dashboard</NavLink>
+                    )}
+                    <button type="button" onClick={() => {
+                      localStorage.removeItem("token")
+                      localStorage.removeItem("user")
+                      localStorage.removeItem("isLoggedIn")
+                      window.location.href = "/login"
+                    }}>Logout</button>
+                  </>
+                ) : (
+                  <>
+                    <NavLink to="/login">Login</NavLink>
+                    <NavLink to="/register">Register</NavLink>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -121,8 +139,8 @@ function Navbar() {
         <NavLink to="/" onClick={() => setMobileOpen(false)}>Home</NavLink>
         <NavLink to="/restaurant" onClick={() => setMobileOpen(false)}>Restaurants</NavLink>
         <NavLink to="/cart" onClick={() => setMobileOpen(false)}>Cart</NavLink>
-        <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</NavLink>
-        <NavLink to="/login" onClick={() => setMobileOpen(false)}>Login</NavLink>
+        {user?.role === "partner" && <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</NavLink>}
+        <NavLink to={localStorage.getItem("token") ? "/profile" : "/login"} onClick={() => setMobileOpen(false)}>{localStorage.getItem("token") ? "Profile" : "Login"}</NavLink>
       </nav>
 
       <div className="mobile-bottom-bar">

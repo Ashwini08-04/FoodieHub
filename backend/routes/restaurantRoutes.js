@@ -3,6 +3,7 @@ const express = require("express");
 const {
   getRestaurants,
   getRestaurantById,
+  getOwnerRestaurants,
   createRestaurant,
   updateRestaurant,
   deleteRestaurant,
@@ -14,11 +15,12 @@ const router = express.Router();
 
 // Public Routes
 router.get("/", getRestaurants);
+router.get("/owner", isAuth, getOwnerRestaurants);
 router.get("/:id", getRestaurantById);
 
 // Protected Routes
-router.post("/", isAuth, isAdmin, createRestaurant);
-router.put("/:id", isAuth, isAdmin, updateRestaurant);
-router.delete("/:id", isAuth, isAdmin, deleteRestaurant);
+router.post("/", isAuth, createRestaurant);
+router.put("/:id", isAuth, updateRestaurant);
+router.delete("/:id", isAuth, deleteRestaurant);
 
 module.exports = router;

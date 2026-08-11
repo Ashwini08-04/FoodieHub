@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../models");
+const { User, Restaurant, Food } = require("../models");
 
 const generateToken = (id, role) => {
   return jwt.sign(
@@ -12,14 +12,41 @@ const generateToken = (id, role) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role = "user", location, restaurant } = req.body;
     if (!name || !email || !password) return res.status(400).json({ message: "Please fill all fields" });
     
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) return res.status(400).json({ message: "User already exists" });
     
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword, role: "user" });
+    const user = await User.create({ name, email, password: hashedPassword, location, role: role || "user" });
+
+    // If partner, create a restaurant tied to this user (owner)
+    if (user.role === "partner" && restaurant && restaurant.name) {
+      const restaurantData = {
+        name: restaurant.name,
+        category: restaurant.category || "Uncategorized",
+        image: restaurant.image || null,
+        address: restaurant.address || location || null,
+        ownerId: user.id,
+      };
+
+      const createdRestaurant = await Restaurant.create(restaurantData);
+
+      if (Array.isArray(restaurant.dishes)) {
+        for (const dish of restaurant.dishes) {
+          const dishData = {
+            name: dish.name || "Dish",
+            price: dish.price || 0,
+            image: dish.image || null,
+            category: dish.category || "",
+            description: dish.description || "",
+            restaurantId: createdRestaurant.id,
+          };
+          await Food.create(dishData);
+        }
+      }
+    }
     
     const token = generateToken(user.id, user.role);
     res.status(201).json({

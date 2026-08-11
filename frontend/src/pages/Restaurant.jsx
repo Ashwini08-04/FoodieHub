@@ -46,7 +46,7 @@ function Restaurant() {
         <label className="sort-select"><FontAwesomeIcon icon={faSliders} /><select value={sort} onChange={(event) => setSort(event.target.value)}><option>Recommended</option><option>Rating</option><option>Delivery time</option></select><FontAwesomeIcon icon={faChevronDown} /></label>
       </div>
       <div className="restaurant-grid">
-        {filteredRestaurants.map((restaurant, index) => <Link to={`/restaurant/${restaurant.id}`} key={restaurant.id} className="restaurant-result" style={{ "--delay": `${index * 70}ms` }}><RestaurantCard {...restaurant} /></Link>)}
+        {filteredRestaurants.map((restaurant, index) => <Link to={`/restaurant/${restaurant.id || restaurant._id}`} key={restaurant.id || restaurant._id} className="restaurant-result" style={{ "--delay": `${index * 70}ms` }}><RestaurantCard {...restaurant} /></Link>)}
       </div>
       {filteredRestaurants.length === 0 && <div className="no-results"><div>🍽️</div><h2>No restaurants found</h2><p>Try a different cuisine or clear your search.</p><button onClick={() => { setSearch(""); setCategory("All") }}>Clear filters</button></div>}
     </main>

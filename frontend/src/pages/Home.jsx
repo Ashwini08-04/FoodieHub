@@ -92,7 +92,7 @@ function Home() {
         </div>
         <div className="cards">
           {featured.map((restaurant, index) => (
-            <Link className="restaurant-link" to={`/restaurant/${restaurant.id}`} key={restaurant.id} style={{ "--delay": `${index * 90}ms` }}>
+            <Link className="restaurant-link" to={`/restaurant/${restaurant.id || restaurant._id}`} key={restaurant.id || restaurant._id} style={{ "--delay": `${index * 90}ms` }}>
               <RestaurantCard {...restaurant} />
             </Link>
           ))}

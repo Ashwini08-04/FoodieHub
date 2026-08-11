@@ -54,16 +54,22 @@ const getFoodsByRestaurant = async (req, res) => {
 // Create food item
 const createFood = async (req, res) => {
   try {
-    const { name, price, image, category, description, isAvailable } = req.body;
-    const { restaurantId } = req.params;
+    const { name, price, image, category, description, isAvailable, restaurantId } = req.body;
 
-    const restaurant = await Restaurant.findByPk(restaurantId);
+    const restId = restaurantId || req.params.restaurantId;
+
+    const restaurant = await Restaurant.findByPk(restId);
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
+    // Only restaurant owner or admin can add food
+    if (req.user.role !== 'admin' && restaurant.ownerId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden: only restaurant owner can add menu items" });
+    }
+
     const food = await Food.create({
-      name, price, image, category, description, isAvailable, restaurantId
+      name, price, image, category, description, isAvailable, restaurantId: restId
     });
 
     res.status(201).json({ message: "Food item created successfully", food });
@@ -75,16 +81,23 @@ const createFood = async (req, res) => {
 // Update food item
 const updateFood = async (req, res) => {
   try {
+    const food = await Food.findByPk(req.params.id);
+    if (!food) return res.status(404).json({ message: "Food item not found" });
+
+    const restaurant = await Restaurant.findByPk(food.restaurantId);
+    if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
+
+    // Only owner or admin
+    if (req.user.role !== 'admin' && restaurant.ownerId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
     const [updatedRows] = await Food.update(req.body, {
       where: { id: req.params.id }
     });
 
-    if (updatedRows === 0) {
-      return res.status(404).json({ message: "Food item not found" });
-    }
-    
-    const food = await Food.findByPk(req.params.id);
-    res.status(200).json({ message: "Food item updated successfully", food });
+    const updatedFood = await Food.findByPk(req.params.id);
+    res.status(200).json({ message: "Food item updated successfully", food: updatedFood });
   } catch (error) {
     res.status(500).json({ message: "Failed to update food item", error: error.message });
   }
@@ -93,13 +106,18 @@ const updateFood = async (req, res) => {
 // Delete food item
 const deleteFood = async (req, res) => {
   try {
-    const deleted = await Food.destroy({
-      where: { id: req.params.id }
-    });
+    const food = await Food.findByPk(req.params.id);
+    if (!food) return res.status(404).json({ message: "Food item not found" });
 
-    if (!deleted) {
-      return res.status(404).json({ message: "Food item not found" });
+    const restaurant = await Restaurant.findByPk(food.restaurantId);
+    if (!restaurant) return res.status(404).json({ message: "Restaurant not found" });
+
+    // Only owner or admin
+    if (req.user.role !== 'admin' && restaurant.ownerId !== req.user.id) {
+      return res.status(403).json({ message: "Forbidden" });
     }
+
+    await Food.destroy({ where: { id: req.params.id } });
 
     res.status(200).json({ message: "Food item deleted successfully" });
   } catch (error) {

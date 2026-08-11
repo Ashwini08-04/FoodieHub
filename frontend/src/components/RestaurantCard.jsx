@@ -27,7 +27,14 @@ function RestaurantCard({
 
       {/* Restaurant image */}
       <div className="restaurant-image">
-        <img src={image} alt={name} />
+        <img
+          src={image || "/images/pizza-house.jpg"}
+          alt={name}
+          onError={(event) => {
+            event.currentTarget.onerror = null
+            event.currentTarget.src = "/images/pizza-house.jpg"
+          }}
+        />
       </div>
 
       <div className="restaurant-info">
