@@ -20,7 +20,7 @@ import { io } from "socket.io-client"
 import api from "../api/api"
 import "./UserDashboard.css"
 
-const SOCKET_URL = "http://localhost:5000"
+const SOCKET_URL = "https://foodiehub-9urm.onrender.com";
 
 const ORDER_STAGES = [
   "Placed",
