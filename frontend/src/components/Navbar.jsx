@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -8,19 +8,22 @@ import {
   faHome,
   faLocationDot,
   faMagnifyingGlass,
-  faStore,
   faUser,
-  faXmark,
-  faUserAstronaut,
-  faUserShield,
-  faRightFromBracket,
-  faClipboardList
+  faXmark
 } from "@fortawesome/free-solid-svg-icons"
+
 import { CartContext } from "../context/CartContext"
 import "./Navbar.css"
 
 function Navbar() {
   const user = JSON.parse(localStorage.getItem("user") || "null")
+  const isLoggedIn = Boolean(localStorage.getItem("token"))
+  const isPartner = user?.role === "partner"
+
+  const dashboardLabel = isPartner
+    ? "Partner Dashboard"
+    : "My Dashboard"
+
   const tabs = [
     { label: "Home", to: "/", icon: faHome },
     { label: "Search", to: "/restaurant", icon: faMagnifyingGlass },
@@ -28,128 +31,279 @@ function Navbar() {
     { label: "Profile", to: "/profile", icon: faUser }
   ]
 
-  if (user?.role === "partner") {
-    tabs.splice(2, 0, { label: "Dashboard", to: "/dashboard", icon: faClipboardList })
-  }
-  const { cart, cartCount } = useContext(CartContext)
+  const { cartCount } = useContext(CartContext)
+
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [locationText, setLocationText] = useState("Bengaluru")
   const [searchValue, setSearchValue] = useState("")
+
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.pageYOffset > 10)
+    const onScroll = () => {
+      setScrolled(window.pageYOffset > 10)
+    }
+
     window.addEventListener("scroll", onScroll)
-    return () => window.removeEventListener("scroll", onScroll)
+
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+    }
   }, [])
 
-  const navLabel = useMemo(() => pathname === "/" ? "Home" : pathname.replace("/", "") || "Home", [pathname])
+  useEffect(() => {
+    setMobileOpen(false)
+    setProfileOpen(false)
+  }, [pathname])
 
   const handleSubmit = (event) => {
     event.preventDefault()
+
     const query = searchValue.trim()
+
     setMobileOpen(false)
-    navigate(`/restaurant${query ? `?search=${encodeURIComponent(query)}` : ""}`)
+
+    navigate(
+      `/restaurant${
+        query ? `?search=${encodeURIComponent(query)}` : ""
+      }`
+    )
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    localStorage.removeItem("isLoggedIn")
+
+    setProfileOpen(false)
+    setMobileOpen(false)
+
+    window.location.href = "/login"
   }
 
   return (
     <>
       <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
+
         <div className="navbar-start">
-          <button className="mobile-menu-toggle" onClick={() => setMobileOpen((value) => !value)}>
-            <FontAwesomeIcon icon={mobileOpen ? faXmark : faBars} />
+
+          <button
+            className="mobile-menu-toggle"
+            onClick={() => setMobileOpen((value) => !value)}
+            aria-label="Toggle menu"
+          >
+            <FontAwesomeIcon
+              icon={mobileOpen ? faXmark : faBars}
+            />
           </button>
+
           <NavLink to="/" className="brand">
             <span>🍔</span>
+
             <div>
               <strong>Foodie</strong>
               <small>Hub</small>
             </div>
           </NavLink>
+
         </div>
 
-        <form className="navbar-search" onSubmit={handleSubmit}>
+        <form
+          className="navbar-search"
+          onSubmit={handleSubmit}
+        >
+
           <label className="location-pill">
             <FontAwesomeIcon icon={faLocationDot} />
-            <select value={locationText} onChange={(event) => setLocationText(event.target.value)}>
+
+            <select
+              value={locationText}
+              onChange={(event) =>
+                setLocationText(event.target.value)
+              }
+            >
               <option>Bengaluru</option>
               <option>Mumbai</option>
               <option>Delhi NCR</option>
               <option>Hyderabad</option>
+              <option>Nagpur</option>
+              <option>Pune</option>
+              <option>Jalgaon</option>
+              <option>Nashik</option>
             </select>
+
             <FontAwesomeIcon icon={faChevronDown} />
           </label>
+
           <label className="search-pill">
             <FontAwesomeIcon icon={faMagnifyingGlass} />
+
             <input
               type="search"
               placeholder="Search restaurants, dishes..."
               value={searchValue}
-              onChange={(event) => setSearchValue(event.target.value)}
+              onChange={(event) =>
+                setSearchValue(event.target.value)
+              }
               aria-label="Search"
             />
           </label>
+
         </form>
 
         <div className="navbar-actions">
-          <NavLink to="/restaurant" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+
+          <NavLink
+            to="/restaurant"
+            className={({ isActive }) =>
+              isActive
+                ? "nav-link active"
+                : "nav-link"
+            }
+          >
             Restaurants
           </NavLink>
-          <NavLink to="/cart" className="nav-link cart-link">
+
+          <NavLink
+            to="/cart"
+            className="nav-link cart-link"
+          >
             <FontAwesomeIcon icon={faCartShopping} />
+
             Cart
-            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+
+            {cartCount > 0 && (
+              <span className="cart-badge">
+                {cartCount}
+              </span>
+            )}
           </NavLink>
+
           <div className="profile-menu">
-            <button type="button" onClick={() => setProfileOpen((value) => !value)}>
+
+            <button
+              type="button"
+              onClick={() =>
+                setProfileOpen((value) => !value)
+              }
+              className={profileOpen ? "profile-trigger open" : "profile-trigger"}
+            >
               <FontAwesomeIcon icon={faUser} />
               <span>Profile</span>
+              <FontAwesomeIcon
+                icon={faChevronDown}
+                className="profile-chevron"
+              />
             </button>
+
             {profileOpen && (
               <div className="profile-dropdown">
-                {localStorage.getItem("token") ? (
+
+                {isLoggedIn ? (
                   <>
-                    <NavLink to="/profile">Profile</NavLink>
-                    {user?.role === "partner" && (
-                      <NavLink to="/dashboard">Dashboard</NavLink>
-                    )}
-                    <button type="button" onClick={() => {
-                      localStorage.removeItem("token")
-                      localStorage.removeItem("user")
-                      localStorage.removeItem("isLoggedIn")
-                      window.location.href = "/login"
-                    }}>Logout</button>
+                    <NavLink
+                      to="/profile"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      Profile
+                    </NavLink>
+
+                    <NavLink
+                      to="/dashboard"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {dashboardLabel}
+                    </NavLink>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
                   </>
                 ) : (
                   <>
-                    <NavLink to="/login">Login</NavLink>
-                    <NavLink to="/register">Register</NavLink>
+                    <NavLink
+                      to="/login"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      Login
+                    </NavLink>
+
+                    <NavLink
+                      to="/register"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      Register
+                    </NavLink>
                   </>
                 )}
+
               </div>
             )}
+
           </div>
+
         </div>
       </header>
 
-      <nav className={`mobile-drawer ${mobileOpen ? "open" : ""}`}>
-        <NavLink to="/" onClick={() => setMobileOpen(false)}>Home</NavLink>
-        <NavLink to="/restaurant" onClick={() => setMobileOpen(false)}>Restaurants</NavLink>
-        <NavLink to="/cart" onClick={() => setMobileOpen(false)}>Cart</NavLink>
-        {user?.role === "partner" && <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}>Dashboard</NavLink>}
-        <NavLink to={localStorage.getItem("token") ? "/profile" : "/login"} onClick={() => setMobileOpen(false)}>{localStorage.getItem("token") ? "Profile" : "Login"}</NavLink>
+      <nav
+        className={`mobile-drawer ${
+          mobileOpen ? "open" : ""
+        }`}
+      >
+
+        <NavLink
+          to="/"
+          onClick={() => setMobileOpen(false)}
+        >
+          Home
+        </NavLink>
+
+        <NavLink
+          to="/restaurant"
+          onClick={() => setMobileOpen(false)}
+        >
+          Restaurants
+        </NavLink>
+
+        <NavLink
+          to="/cart"
+          onClick={() => setMobileOpen(false)}
+        >
+          Cart
+        </NavLink>
+
+        <NavLink
+          to={isLoggedIn ? "/profile" : "/login"}
+          onClick={() => setMobileOpen(false)}
+        >
+          {isLoggedIn ? "Profile" : "Login"}
+        </NavLink>
+
       </nav>
 
       <div className="mobile-bottom-bar">
+
         {tabs.map((tab) => (
-          <NavLink key={tab.to} to={tab.to} className={({ isActive }) => `bottom-tab ${isActive ? "active" : ""}`}>
+          <NavLink
+            key={tab.to}
+            to={tab.to}
+            className={({ isActive }) =>
+              `bottom-tab ${
+                isActive ? "active" : ""
+              }`
+            }
+          >
             <FontAwesomeIcon icon={tab.icon} />
             <span>{tab.label}</span>
           </NavLink>
         ))}
+
       </div>
     </>
   )

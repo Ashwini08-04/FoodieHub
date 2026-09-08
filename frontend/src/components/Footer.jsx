@@ -1,43 +1,99 @@
+import { Link } from "react-router-dom"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+  faLocationDot,
+  faEnvelope,
+  faPhone,
+  faGlobe
+} from "@fortawesome/free-solid-svg-icons"
+
 import "./Footer.css"
 
 function Footer() {
   return (
     <footer className="footer-shell">
-      <div className="footer-grid">
-        <div className="footer-brand">
-          <strong>FoodieHub</strong>
-          <p>Delicious meals delivered fast and fresh.</p>
-        </div>
+      <div className="footer-container">
 
-        <div>
-          <h3>Company</h3>
-          <a href="/">About</a>
-          <a href="/restaurant">Restaurants</a>
-          <a href="/dashboard">Dashboard</a>
-        </div>
+        <div className="footer-top">
 
-        <div>
-          <h3>Legal</h3>
-          <a href="#">Terms</a>
-          <a href="#">Privacy</a>
-          <a href="#">Support</a>
-        </div>
+          <div className="footer-brand">
+            <Link to="/" className="footer-logo">
+              <span className="footer-logo-mark">F</span>
+              <span>
+                Foodie<span>Hub</span>
+              </span>
+            </Link>
 
-        <div>
-          <h3>Subscribe</h3>
-          <p>Get exclusive offers and new restaurant launches.</p>
-          <div className="footer-subscribe">
-            <input type="email" placeholder="Your email" aria-label="Email" />
-            <button>Join</button>
+            <p>
+              Discover delicious food, explore amazing restaurants,
+              and get your favourite meals delivered fresh to your door.
+            </p>
+
+            <div className="footer-contact">
+              <span>
+                <FontAwesomeIcon icon={faLocationDot} />
+                India
+              </span>
+
+              <span>
+                <FontAwesomeIcon icon={faEnvelope} />
+                hello@foodiehub.com
+              </span>
+            </div>
           </div>
+
+          <div className="footer-column">
+            <h3>Explore</h3>
+            <Link to="/">Home</Link>
+            <Link to="/restaurant">Restaurants</Link>
+            <Link to="/restaurant">Popular Food</Link>
+            <Link to="/restaurant">Offers</Link>
+          </div>
+
+          <div className="footer-column">
+            <h3>FoodieHub</h3>
+            <Link to="/profile">My Profile</Link>
+            <Link to="/cart">My Cart</Link>
+            <Link to="/dashboard">My Orders</Link>
+            <Link to="/dashboard">Dashboard</Link>
+          </div>
+
+          <div className="footer-column">
+            <h3>Support</h3>
+            <a href="#">Help Center</a>
+            <a href="#">Contact Us</a>
+            <a href="#">Terms & Conditions</a>
+            <a href="#">Privacy Policy</a>
+          </div>
+
         </div>
-      </div>
-      <div className="footer-bottom">
-        <span>© 2026 FoodieHub. Built for tasty deliveries.</span>
-        <div className="footer-badges">
-          <span>App Store</span>
-          <span>Google Play</span>
+
+        <div className="footer-divider"></div>
+
+        <div className="footer-bottom">
+
+          <div className="footer-copyright">
+            <span>© 2026 FoodieHub</span>
+            <span className="footer-dot">•</span>
+            <span>Made with love for food lovers.</span>
+          </div>
+
+          <div className="footer-socials">
+            <a href="#" aria-label="Website">
+              <FontAwesomeIcon icon={faGlobe} />
+            </a>
+
+            <a href="#" aria-label="Contact">
+              <FontAwesomeIcon icon={faEnvelope} />
+            </a>
+
+            <a href="#" aria-label="Phone">
+              <FontAwesomeIcon icon={faPhone} />
+            </a>
+          </div>
+
         </div>
+
       </div>
     </footer>
   )

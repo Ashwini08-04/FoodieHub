@@ -10,24 +10,61 @@ import {
 import { CartContext } from "../context/CartContext"
 import "./FoodCard.css"
 
-function FoodCard({ id, name, category, description, price, image, rating = 4.5, bestseller }) {
+function FoodCard({
+  id,
+  name,
+  category,
+  description,
+  price,
+  image,
+  rating = 4.5,
+  bestseller,
+  restaurantId,
+  restaurantName,
+  offer
+}) {
   const { addItem } = useContext(CartContext)
 
   const addToCart = () => {
-    addItem({ food: id, name, category, price, image })
+    addItem({
+      food: id,
+      name,
+      category,
+      price,
+      image,
+      restaurantId,
+      restaurantName,
+      offer
+    })
   }
+
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : image.startsWith("/")
+        ? image
+        : `/${image}`
+    : "/images/cheese-pizza.jpg"
 
   return (
     <div className="food-card">
 
-      {bestseller && <span className="food-bestseller">Bestseller</span>}
+      {bestseller && (
+        <span className="food-bestseller">
+          Bestseller
+        </span>
+      )}
+
       <div className="food-image">
         <img
-          src={image || "/images/cheese-pizza.jpg"}
+          src={imageUrl}
           alt={name}
+          loading="lazy"
+          decoding="async"
           onError={(event) => {
             event.currentTarget.onerror = null
-            event.currentTarget.src = "/images/cheese-pizza.jpg"
+            event.currentTarget.src =
+              "/images/cheese-pizza.jpg"
           }}
         />
       </div>
@@ -44,8 +81,16 @@ function FoodCard({ id, name, category, description, price, image, rating = 4.5,
           </span>
         </div>
 
-        <p className="food-category"><FontAwesomeIcon icon={faLeaf} /> {category}</p>
-        {description && <p className="food-description">{description}</p>}
+        <p className="food-category">
+          <FontAwesomeIcon icon={faLeaf} />
+          {category}
+        </p>
+
+        {description && (
+          <p className="food-description">
+            {description}
+          </p>
+        )}
 
         <small>
           <FontAwesomeIcon icon={faClock} />
@@ -54,7 +99,9 @@ function FoodCard({ id, name, category, description, price, image, rating = 4.5,
 
         <div className="food-bottom">
 
-          <strong>₹{price}</strong>
+          <strong>
+            ₹{Number(price).toLocaleString("en-IN")}
+          </strong>
 
           <button onClick={addToCart}>
             <FontAwesomeIcon icon={faCartShopping} />

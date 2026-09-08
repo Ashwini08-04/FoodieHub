@@ -1,106 +1,203 @@
 .footer-shell {
-  padding: 48px clamp(24px, 4vw, 64px);
-  background: #1c1c1c;
-  color: #f1f1f1;
-}
-
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(180px, 1fr));
-  gap: 28px;
-  margin-bottom: 30px;
-}
-
-.footer-brand strong {
-  display: block;
-  font-size: 1.55rem;
-  margin-bottom: 14px;
-  letter-spacing: -.04em;
-}
-
-.footer-brand p,
-.footer-shell a,
-.footer-shell span,
-.footer-shell input {
-  color: rgba(241, 241, 241, 0.84);
-}
-
-.footer-shell h3 {
-  font-size: 0.92rem;
-  margin-bottom: 14px;
-  letter-spacing: 0.02em;
-}
-
-.footer-shell a {
-  display: block;
-  margin-bottom: 10px;
-  color: rgba(241, 241, 241, 0.84);
-  font-size: 0.94rem;
-}
-
-.footer-shell a:hover {
-  color: white;
-}
-
-.footer-subscribe {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.footer-subscribe input {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(241, 241, 241, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  color: white;
+  background: #fff;
+  border-top: 1px solid #eee6e0;
+  color: #3b322d;
 }
 
-.footer-subscribe button {
-  padding: 12px 18px;
-  border-radius: 14px;
-  background: #e23744;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
+.footer-container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr 1fr 1fr;
+  gap: 45px;
+  padding: 38px 0 30px;
+}
+
+.footer-brand {
+  max-width: 330px;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #302721;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.footer-logo > span:last-child > span {
+  color: #e85d2a;
+}
+
+.footer-logo-mark {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #e85d2a;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.footer-brand p {
+  margin: 13px 0 16px;
+  color: #8b8079;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.footer-contact span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #81766f;
+  font-size: 10px;
+}
+
+.footer-contact svg {
+  width: 11px;
+  color: #e85d2a;
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.footer-column h3 {
+  margin: 2px 0 6px;
+  color: #332a25;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.footer-column a {
+  width: fit-content;
+  color: #81766f;
+  font-size: 10px;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.footer-column a:hover {
+  color: #e85d2a;
+  transform: translateX(2px);
+}
+
+.footer-divider {
+  width: 100%;
+  height: 1px;
+  background: #eee8e3;
 }
 
 .footer-bottom {
+  min-height: 52px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 18px;
-  font-size: 0.92rem;
-  color: rgba(241, 241, 241, 0.78);
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.footer-badges {
+.footer-copyright {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
+  color: #9a9089;
+  font-size: 9px;
 }
 
-.footer-badges span {
-  padding: 10px 14px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
+.footer-dot {
+  color: #e85d2a;
+  font-size: 12px;
 }
 
-@media (max-width: 900px) {
-  .footer-grid {
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.footer-socials a {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e9e1db;
+  border-radius: 8px;
+  color: #827770;
+  font-size: 10px;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.footer-socials a:hover {
+  border-color: #e85d2a;
+  background: #fff3ed;
+  color: #e85d2a;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 800px) {
+  .footer-top {
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 30px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-container {
+    width: min(100% - 30px, 450px);
+  }
+
+  .footer-top {
     grid-template-columns: 1fr 1fr;
+    gap: 25px 35px;
+    padding: 30px 0 25px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 0;
   }
 }
 
-@media (max-width: 640px) {
-  .footer-grid,
-  .footer-bottom {
-    grid-template-columns: 1fr;
-    display: grid;
+@media (max-width: 380px) {
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
   }
 
-  .footer-bottom {
-    gap: 12px;
+  .footer-column h3 {
+    font-size: 11px;
+  }
+
+  .footer-column a {
+    font-size: 9px;
   }
 }

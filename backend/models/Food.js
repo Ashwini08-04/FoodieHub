@@ -1,37 +1,49 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const { DataTypes } = require("sequelize")
+const sequelize = require("../config/database")
 
 const Food = sequelize.define("Food", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
-    primaryKey: true,
+    primaryKey: true
   },
+
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false
   },
+
   price: {
     type: DataTypes.FLOAT,
-    allowNull: false,
+    allowNull: false
   },
+
   image: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING
   },
+
   category: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING
   },
+
   description: {
-    type: DataTypes.TEXT,
+    type: DataTypes.TEXT
   },
+
+  rating: {
+    type: DataTypes.FLOAT,
+    defaultValue: 4.5
+  },
+
   isAvailable: {
     type: DataTypes.BOOLEAN,
-    defaultValue: true,
+    defaultValue: true
   },
+
   restaurantId: {
     type: DataTypes.UUID,
-    allowNull: false,
-  },
-});
+    allowNull: false
+  }
+})
 
-module.exports = Food;
+module.exports = Food

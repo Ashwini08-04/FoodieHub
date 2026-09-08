@@ -16,20 +16,31 @@ function RestaurantCard({
   distance,
   offer
 }) {
+  const imageUrl = image?.startsWith("http")
+    ? image
+    : image
+      ? image.startsWith("/")
+        ? image
+        : `/${image}`
+      : "/images/pizza-house.jpg"
+
   return (
     <div className="restaurant-card">
 
       {/* Offer badge */}
-      <span className="offer-badge">
-        <FontAwesomeIcon icon={faFire} />
-        {offer}
-      </span>
+      {offer && (
+        <span className="offer-badge">
+          <FontAwesomeIcon icon={faFire} />
+          {offer}
+        </span>
+      )}
 
       {/* Restaurant image */}
       <div className="restaurant-image">
         <img
-          src={image || "/images/pizza-house.jpg"}
-          alt={name}
+          src={imageUrl}
+          alt={`${name} restaurant`}
+          loading="lazy"
           onError={(event) => {
             event.currentTarget.onerror = null
             event.currentTarget.src = "/images/pizza-house.jpg"
